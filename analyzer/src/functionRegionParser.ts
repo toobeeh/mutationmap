@@ -4,13 +4,25 @@ import {
     MethodDeclaration,
     FunctionDeclaration,
     FunctionExpression,
-    ArrowFunction
+    ArrowFunction,
+    ConstructorDeclaration, GetAccessorDeclaration, SetAccessorDeclaration
 } from "ts-morph";
 
 /**
  * Node types that are considered function-like
+ *
+ * Easy cases: function/method/constructor declarations
+ * function abc(){ }
+ * private abc() { }
+ * constructor() { }
+ *
+ * Everything else are expressions or arrow functions and have no declared name:
+ * function expressions might have a name, arrow functions have no declared name
+ *
  */
-export type FunctionNode = MethodDeclaration | FunctionDeclaration | FunctionExpression | ArrowFunction;
+export type FunctionNode = MethodDeclaration | FunctionDeclaration | ConstructorDeclaration |
+    GetAccessorDeclaration | SetAccessorDeclaration |
+    FunctionExpression | ArrowFunction;
 
 /**
  * Node kinds that are considered function-like
@@ -19,6 +31,9 @@ export const functionNodeKinds = [
     MethodDeclaration,
     FunctionDeclaration,
     FunctionExpression,
+    ConstructorDeclaration,
+    GetAccessorDeclaration,
+    SetAccessorDeclaration,
     ArrowFunction
 ];
 
