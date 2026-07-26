@@ -12,11 +12,11 @@ import {Project, Node} from "ts-morph";
  * @param regionParser parser for a specific region type, used as a basis for parsed attribution units
  * @param propertyParser parser for the properties of the attribution unit
  */
-export function analyzeAttributionUnits<TUnit extends attributionUnit, TRegion extends Node>(
+export async function analyzeAttributionUnits<TUnit extends attributionUnit, TRegion extends Node>(
     config: analyzerConfig,
     regionParser: regionParser<TRegion>,
     propertyParser: propertyParser<TUnit, TRegion>
-): TUnit[] {
+): Promise<TUnit[]> {
 
     /* init AST parsing context */
     const project = new Project({
@@ -32,14 +32,14 @@ export function analyzeAttributionUnits<TUnit extends attributionUnit, TRegion e
     /* parse properties of units */
     const units: TUnit[] = [];
     for(const region of regions) {
-        const unit = propertyParser.parseProperties(config.path, region);
+        const unit = await propertyParser.parseProperties(config, region);
         units.push(unit);
     }
 
     return units;
 }
 
-export function analyzeFunctionAttributionUnits(config: analyzerConfig) {
-    return analyzeAttributionUnits<attributionUnit, Node>(config, new FunctionRegionParser(), new CorePropertyParser());
+export async function analyzeFunctionAttributionUnits(config: analyzerConfig) {
+    return analyzeAttributionUnits<attributionUnit, Node>(config, new FunctionRegionParser(), new CorePropertyParser(config.repoSourcePath));
 }
 

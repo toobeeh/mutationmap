@@ -4,9 +4,10 @@ import cac from "cac";
 const cli = cac("mutationmap-analyzer-cli");
 cli.help();
 cli.command("<path>", "Analyze a file for attribution units")
-    .action((path) => {
-        const config = { path };
-        const units = analyzeFunctionAttributionUnits(config);
+    .option("-g, --gitRepoPath <repoSourcePath>", "Path to git repository")
+    .action(async (path, repoSourcePath) => {
+        const config = { path, repoSourcePath };
+        const units = await analyzeFunctionAttributionUnits(config);
         console.log(units);
     });
 

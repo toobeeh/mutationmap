@@ -1,5 +1,6 @@
 import {Node} from "ts-morph";
 import type {attributionUnit} from "./attribution-unit.interface.js";
+import type {analyzerConfig} from "./analyzer-config.interface.js";
 
 /**
  * Parse an attribution unit from a given region
@@ -9,5 +10,5 @@ import type {attributionUnit} from "./attribution-unit.interface.js";
  * @returns The parsed attribution unit
  */
 export interface propertyParser<TUnit extends attributionUnit, TRegion extends Node> {
-    parseProperties(path: string, region: TRegion): TUnit;
+    parseProperties(config: analyzerConfig, region: TRegion): Promise<TUnit>;
 }
