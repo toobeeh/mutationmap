@@ -14,7 +14,7 @@ export interface attributionUnit {
 
     /**
      * The location of the unit in the source code.
-     * Format: [path] #[lineStart]:[lineEnd]
+     * Format: [path] #[lineStart]-[lineEnd]
      */
     location: string;
 
@@ -23,4 +23,9 @@ export interface attributionUnit {
      * Parsed from git metadata.
      */
     author: string;
+
+    /**
+     * Additional property, describing the kind of AST node that the region represents
+     */
+    nodeKind: string;
 }

@@ -1,4 +1,4 @@
-import type {attributionUnit} from "./types/attribution.unit.js";
+import type {attributionUnit} from "./types/attribution-unit.interface.js";
 import type {analyzerConfig} from "./types/analyzer-config.interface.js";
 import type {regionParser} from "./types/region-parser.interface.js";
 import type {propertyParser} from "./types/property-parser.interface.js";

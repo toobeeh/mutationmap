@@ -1,5 +1,5 @@
 import {Node} from "ts-morph";
-import type {attributionUnit} from "./attribution.unit.js";
+import type {attributionUnit} from "./attribution-unit.interface.js";
 
 /**
  * Parse an attribution unit from a given region

@@ -1,0 +1,22 @@
+{
+  "name": "mutationmap-analyzer",
+  "version": "1.0.0",
+  "description": "Source Code analyzer for DOM mutation attribution, parsing mutation units via AST analysis",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "ts-morph": "^28.0.0"
+  }
+}
