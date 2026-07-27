@@ -40,14 +40,17 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
 
         const gitBlame = await this.getGitBlameForRegion(region);
         const author = gitBlame !== undefined ? this.getAuthorFromGitBlame(gitBlame) : undefined;
-        const location = `${region.getSourceFile().getBaseName()} #${region.getStartLineNumber()}-${region.getEndLineNumber()}`;
+        const location = {
+            file: region.getSourceFile().getBaseName(),
+            startLine: region.getStartLineNumber(),
+            endLine: region.getEndLineNumber()
+        }
         const nodeKind = region.getKindName();
 
         return {
-            name,
-            author: author ?? "Unknown",
+            identifier: name,
             location,
-            nodeKind
+            author: author ?? "Unknown"
         }
     }
 

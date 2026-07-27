@@ -2,30 +2,26 @@
  * An entity that causes DOM mutations and can be used to
  * attribute the mutations to a source code location
  */
-export interface attributionUnit {
+export interface attributionUnit<TIdentifier = string> {
 
     /**
-     * The name of the attribution unit.
-     * Format: [className].[functionName]
-     * or [className].[functionName]([constants)]
-     * if the unit has no identifier and passed as expression
+     * The identifier of the attribution unit.
+     * May be plain string or object with multiple properties for versatility
      */
-    name: string;
+    identifier: TIdentifier;
 
     /**
-     * The location of the unit in the source code.
-     * Format: [path] #[lineStart]-[lineEnd]
+     * The location of the unit in the source code
      */
-    location: string;
+    location: {
+        file: string;
+        startLine: number;
+        endLine: number;
+    }
 
     /**
      * The author of the unit.
      * Parsed from git metadata.
      */
     author: string;
-
-    /**
-     * Additional property, describing the kind of AST node that the region represents
-     */
-    nodeKind: string;
 }
