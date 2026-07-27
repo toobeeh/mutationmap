@@ -2,13 +2,12 @@
  * An entity that causes DOM mutations and can be used to
  * attribute the mutations to a source code location
  */
-export interface attributionUnit<TIdentifier = string> {
+export interface attributionUnit {
 
     /**
-     * The identifier of the attribution unit.
-     * May be plain string or object with multiple properties for versatility
+     * The expressive name of the attribution unit, describing its semantic content
      */
-    identifier: TIdentifier;
+    name: string;
 
     /**
      * The location of the unit in the source code

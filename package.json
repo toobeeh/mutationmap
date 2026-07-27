@@ -2,6 +2,8 @@
   "private": true,
   "workspaces": [
     "analyzer",
-    "analyzer-cli"
+    "analyzer-cli",
+    "transpiler",
+    "demo-app"
   ]
 }

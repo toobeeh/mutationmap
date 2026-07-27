@@ -53,7 +53,7 @@ export async function analyzeAttributionUnitsInText<TUnit extends attributionUni
             allowJs: true
         }
     });
-    project.createSourceFile(aliasPath, text);
+    project.createSourceFile(aliasPath, text, {overwrite: true});
 
     return analyzeAttributionUnitsInProject<TUnit, TRegion>(config, project, regionParser, propertyParser);
 }

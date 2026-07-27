@@ -14,6 +14,16 @@ import type {analyzerConfig} from "./types/analyzer-config.interface.js";
 import {type SimpleGit, simpleGit} from "simple-git";
 
 /**
+ * An interface representing the identification of a function-like region,
+ * including its class name, function name, and caller name
+ */
+export interface functionLikeIdentifier {
+    class?: string | undefined;
+    function?: string | undefined;
+    caller?: string | undefined;
+}
+
+/**
  * A property parser fore core attribution unit properties as per specification
  */
 export class CorePropertyParser implements propertyParser<attributionUnit, FunctionNode> {
@@ -28,30 +38,46 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
 
     async parseProperties(_: analyzerConfig, region: FunctionNode): Promise<attributionUnit> {
 
-        /* use different name retrieval strategies based on function kind */
-        const name = region instanceof MethodDeclaration ? this.getNameFromMethodDeclaration(region) :
-                region instanceof SetAccessorDeclaration ? this.getNameFromMethodDeclaration(region) :
-                region instanceof GetAccessorDeclaration ? this.getNameFromMethodDeclaration(region) :
-                region instanceof FunctionDeclaration ? this.getNameFromFunctionDeclaration(region) :
-                region instanceof ConstructorDeclaration ? this.getNameFronConstructorDeclaration(region) :
-                region instanceof FunctionExpression ? this.getNameFromFunctionExpression(region) :
-                region instanceof ArrowFunction ? this.getNameFromArrowFunction(region) :
-                "Unknown";
-
+        const identifier = this.getIdentificationFromFunctionLikeRegion(region);
+        const name = this.getNameFromIdentifier(identifier);
         const gitBlame = await this.getGitBlameForRegion(region);
         const author = gitBlame !== undefined ? this.getAuthorFromGitBlame(gitBlame) : undefined;
-        const location = {
-            file: region.getSourceFile().getBaseName(),
-            startLine: region.getStartLineNumber(),
-            endLine: region.getEndLineNumber()
-        }
-        const nodeKind = region.getKindName();
+        const location = this.getLocationFromFunctionNode(region);
 
         return {
-            identifier: name,
+            name,
             location,
             author: author ?? "Unknown"
         }
+    }
+
+    /**
+     * Retrieve the location of a function node, including the file name and start/end line numbers.
+     * @param node
+     * @protected
+     */
+    protected getLocationFromFunctionNode(node: FunctionNode): { file: string; startLine: number; endLine: number } {
+        return {
+            file: node.getSourceFile().getBaseName(),
+            startLine: node.getStartLineNumber(),
+            endLine: node.getEndLineNumber()
+        }
+    }
+
+
+    /**
+     *Format the name of a function-like identifier based on available information
+     * @param identifier
+     * @protected
+     */
+    protected getNameFromIdentifier(identifier: functionLikeIdentifier): string {
+        let name = "";
+        if(identifier.class !== undefined) name = `${identifier.class}#`;
+        if(identifier.function !== undefined) name += `${identifier.function}`;
+        else if(identifier.caller !== undefined) name += `${identifier.caller}(..)`;
+        else name += "anonymous";
+
+        return name;
     }
 
     /**
@@ -83,6 +109,32 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
     }
 
     /**
+     * Retrieve the identification of a function-like region,
+     * including its class name, function name, and caller name if applicable,
+     * depending on the specific type of function-like node.
+     * @param node
+     * @protected
+     */
+    protected getIdentificationFromFunctionLikeRegion(node: FunctionNode): functionLikeIdentifier {
+
+        /* use different name retrieval strategies based on function kind */
+        const name = node instanceof MethodDeclaration ? this.getNameFromMethodDeclaration(node) :
+            node instanceof SetAccessorDeclaration ? this.getNameFromMethodDeclaration(node) :
+                node instanceof GetAccessorDeclaration ? this.getNameFromMethodDeclaration(node) :
+                    node instanceof FunctionDeclaration ? this.getNameFromFunctionDeclaration(node) :
+                        node instanceof ConstructorDeclaration ? this.getNameFronConstructorDeclaration(node) :
+                            node instanceof FunctionExpression ? this.getNameFromFunctionExpression(node) :
+                                node instanceof ArrowFunction ? this.getNameFromArrowFunction(node) :
+                                    undefined;
+
+        if(name === undefined) {
+            throw new Error(`Cannot find identifier for function`);
+        }
+
+        return name;
+    }
+
+    /**
      * Extract the author from git blame information
      * @param blame The git blame information as a string
      * @returns The author name if found, otherwise undefined
@@ -108,7 +160,7 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
      * @param fn
      * @protected
      */
-    protected getNameFromFunctionDeclaration(fn: FunctionDeclaration): string {
+    protected getNameFromFunctionDeclaration(fn: FunctionDeclaration): functionLikeIdentifier {
         const ancestorClass = fn.getFirstAncestorByKind(SyntaxKind.FunctionDeclaration);
         const className = ancestorClass !== undefined ? (ancestorClass as FunctionDeclaration).getName() : undefined;
         let fnName = fn.getName();
@@ -119,7 +171,10 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
             fnName = "Unknown";
         }
 
-        return className === undefined ? fnName : `${className}.${fnName}`;
+        return {
+            class: className,
+            function: fnName
+        }
     }
 
     /**
@@ -135,11 +190,15 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
      * @param method
      * @protected
      */
-    protected getNameFromMethodDeclaration(method: MethodDeclaration | GetAccessorDeclaration | SetAccessorDeclaration): string {
+    protected getNameFromMethodDeclaration(method: MethodDeclaration | GetAccessorDeclaration | SetAccessorDeclaration): functionLikeIdentifier {
         const ancestorClass = method.getFirstAncestorByKind(SyntaxKind.ClassDeclaration);
         const className = ancestorClass !== undefined ? (ancestorClass as ClassDeclaration).getName() : undefined;
         const methodName = method.getName();
-        return className === undefined ? methodName : `${className}.${methodName}`;
+
+        return {
+            class: className,
+            function: methodName
+        }
     }
 
     /**
@@ -155,10 +214,14 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
      * @param constructor
      * @protected
      */
-    protected getNameFronConstructorDeclaration(constructor: ConstructorDeclaration): string {
+    protected getNameFronConstructorDeclaration(constructor: ConstructorDeclaration): functionLikeIdentifier {
         const ancestorClass = constructor.getFirstAncestorByKind(SyntaxKind.ClassDeclaration);
         const className = ancestorClass !== undefined ? (ancestorClass as ClassDeclaration).getName() : undefined;
-        return className === undefined ? "Unknown" : `${className}.constructor`;
+
+        return {
+            class: className,
+            function: "constructor"
+        }
     }
 
     /**
@@ -176,10 +239,11 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
      * @param fn
      * @protected
      */
-    protected getNameFromFunctionExpression(fn: FunctionExpression): string {
+    protected getNameFromFunctionExpression(fn: FunctionExpression): functionLikeIdentifier {
         const ancestorClass = fn.getFirstAncestorByKind(SyntaxKind.ClassDeclaration);
         const className = ancestorClass !== undefined ? (ancestorClass as ClassDeclaration).getName() : undefined;
         let fnName = fn.getName();
+        let callerName = undefined;
 
         /* function expressions may not have a name - anonymous or assigned to variable */
         if(fnName === undefined) {
@@ -192,11 +256,15 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
 
             /* try to get calling function */
             if(parent instanceof CallExpression){
-                fnName = `${parent.getExpression().getText()}.argument`; /* TODO improve details */
+                callerName = `${parent.getExpression().getText()}`;
             }
         }
 
-        return className === undefined ? fnName + "" : `${className}.${fnName}`;
+        return {
+            class: className,
+            function: fnName,
+            caller: callerName
+        }
     }
 
     /**
@@ -211,10 +279,11 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
      * @param fn
      * @protected
      */
-    protected getNameFromArrowFunction(fn: ArrowFunction): string {
+    protected getNameFromArrowFunction(fn: ArrowFunction): functionLikeIdentifier {
         const ancestorClass = fn.getFirstAncestorByKind(SyntaxKind.ClassDeclaration);
         const className = ancestorClass !== undefined ? (ancestorClass as ClassDeclaration).getName() : undefined;
-        let fnName = "Anonymous";
+        let fnName = undefined;
+        let callerName = undefined;
 
         /* try to get assigned name, if declaration */
         const parent = fn.getParent();
@@ -224,9 +293,13 @@ export class CorePropertyParser implements propertyParser<attributionUnit, Funct
 
         /* try to get calling function */
         if(parent instanceof CallExpression){
-            fnName = `${parent.getExpression().getText()}.argument`; /* TODO improve details */
+            callerName = `${parent.getExpression().getText()}`;
         }
 
-        return className === undefined ? fnName + "" : `${className}.${fnName}`;
+        return {
+            class: className,
+            function: fnName,
+            caller: callerName
+        }
     }
 }
