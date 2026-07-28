@@ -22,7 +22,8 @@ export class InstrumentationPropertyParser extends CorePropertyParser {
             location,
             author,
             functionKind,
-            identifier
+            identifier,
+            node: region
         }
     }
 }
