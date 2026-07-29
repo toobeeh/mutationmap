@@ -1,4 +1,4 @@
-export default class TestComponent extends HTMLElement {
+export default class DebuggerComponent extends HTMLElement {
 
     private readonly _button = document.createElement('button');
     private readonly _span = document.createElement('span');
@@ -25,6 +25,6 @@ export default class TestComponent extends HTMLElement {
         });
         this.count = 0;
 
-        this.shadowRoot.append(this._button, this._span);
+        this.shadowRoot?.append(this._button, this._span);
     }
 }

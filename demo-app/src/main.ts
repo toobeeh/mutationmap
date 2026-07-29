@@ -1,3 +1,3 @@
-import TestComponent from "./components/test.component.ts";
+import DebuggerComponent from "./components/debugger.component.ts";
 
-customElements.define("test-comp", TestComponent);
+customElements.define("test-comp", DebuggerComponent);
