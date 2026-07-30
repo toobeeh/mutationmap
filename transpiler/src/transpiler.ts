@@ -20,9 +20,8 @@ export class InstrumentationTranspiler {
      * If the initializer flag is set, the index and handler will be initialized in this source code chunk as well.
      * @param units
      * @param id
-     * @param appendIndexInitializer handy for vite dev mode, when not all files are loaded at once
      */
-    public transpileToInstrumentedUnits(units: instrumentationAttributionUnit[], id: string, _ = false): string {
+    public transpileToInstrumentedUnits(units: instrumentationAttributionUnit[], id: string): string {
 
         if(units.length === 0){
             throw new Error("No attribution units provided for file");

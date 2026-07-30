@@ -81,7 +81,7 @@ export function instrumentMutationAttribution(repoSourcePath: string | undefined
 
                 const transpiledSource =
                     units.length == 0 ? src :
-                    transpiler.transpileToInstrumentedUnits(units, id, true);
+                    transpiler.transpileToInstrumentedUnits(units, id);
 
                 return {
                     code: transpiledSource,
