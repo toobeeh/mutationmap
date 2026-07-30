@@ -10,6 +10,9 @@ export class Observer {
     private _currentUnit?: object;
     private _mutationObservers: MutationObserver[] = [];
     private readonly _unitEventhandler = this.processUnitEvent.bind(this) as EventListener;
+    private readonly _backgroundPort = chrome.runtime.connect({
+        name: "content"
+    });
 
     constructor() {
         this._mutationObserver = this.createObserver();
@@ -79,6 +82,11 @@ export class Observer {
                     this._nodeHistory.set(mutation.target, history);
                 }
             }
+
+            /* notify debugger that changes happened */
+            this._backgroundPort.postMessage({
+                type: "mutation"
+            });
         });
     }
 

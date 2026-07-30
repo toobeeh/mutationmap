@@ -13,14 +13,15 @@ export default defineManifest({
             48: 'public/logo.png',
         }
     },
+    background: {
+        service_worker: "src/background/background.ts",
+        type: "module",
+    },
     content_scripts: [{
         js: ['src/content/main.ts'],
         matches: ["<all_urls>"]
     }],
-    background: {
-        service_worker: "src/background/service.ts",
-        type: "module",
-    },
+    devtools_page: "src/devtools/index.html",
     permissions: [
         "storage",
         "tabs"

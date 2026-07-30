@@ -6,6 +6,13 @@ import manifest from './manifest.config.js'
 import { name, version } from './package.json'
 
 export default defineConfig({
+    build: {
+        rolldownOptions: {
+            input: {
+                welcome: 'src/devtools/sidebar.html',
+            },
+        },
+    },
   resolve: {
     alias: {
       '@': `${path.resolve(__dirname, 'src')}`,

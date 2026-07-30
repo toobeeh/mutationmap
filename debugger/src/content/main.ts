@@ -11,15 +11,6 @@ customElements.define("mutationmap-debugger", DebuggerComponent);
 const observer = new Observer();
 observer.observe();
 
-/* listen for activated state */
-chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== "local") return;
-    if (!changes.enabled) return;
-
-    const enabled = (changes.enabled.newValue ?? false) as boolean;
-    console.log("Debugger enabled state changed:", enabled);
-});
-
 /* basic debugger */
 document.addEventListener("contextmenu", (e) => {
     const target = e?.composedPath()?.[0];
@@ -27,3 +18,8 @@ document.addEventListener("contextmenu", (e) => {
 
     console.log("Full history:", observer.getHistory());
 });
+
+(document as any).getUnitLog = function(node: Node) {
+    console.log(node);
+    return JSON.stringify(observer.getHistoryForNode(node));
+}
