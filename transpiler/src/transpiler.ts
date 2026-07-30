@@ -1,6 +1,14 @@
 import type {instrumentationAttributionUnit} from "./types/instrumentationAttributionUnit.interface.js";
 import * as crypto from "crypto";
 
+export interface instrumentationAttributionUnitEvent {
+    name: string;
+    location: instrumentationAttributionUnit["location"];
+    identifier: instrumentationAttributionUnit["identifier"];
+    functionKind: string;
+    author: string;
+}
+
 export class InstrumentationTranspiler {
 
     private parsedUnits: Map<string, instrumentationAttributionUnit[]> = new Map();
@@ -84,9 +92,9 @@ export class InstrumentationTranspiler {
             name: unit.name,
             location: unit.location,
             identifier: unit.identifier,
-            kind: unit.functionKind,
+            functionKind: unit.functionKind,
             author: unit.author
-        })));
+        } as instrumentationAttributionUnitEvent)));
     }
 
 

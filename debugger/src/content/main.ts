@@ -1,11 +1,7 @@
 import '@webcomponents/custom-elements';
 import {Observer} from "./observer.ts";
-import DebuggerComponent from "./components/debugger.component.ts";
 
-console.log("Mutationmap debugger");
-
-/* register custom elements */
-customElements.define("mutationmap-debugger", DebuggerComponent);
+console.log("MutationMap ~ Content");
 
 /* listen for mutations and associate with emitted attribution units */
 const observer = new Observer();
@@ -19,7 +15,7 @@ document.addEventListener("contextmenu", (e) => {
     console.log("Full history:", observer.getHistory());
 });
 
+/* expose to be used by eval in devtools sidebar */
 (document as any).getUnitLog = function(node: Node) {
-    console.log(node);
-    return JSON.stringify(observer.getHistoryForNode(node));
+    return observer.getHistoryForNode(node);
 }

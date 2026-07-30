@@ -1,6 +1,19 @@
+import {instrumentationAttributionUnitEvent} from "mutationmap-transpiler/dist/transpiler.ts";
+
 export interface mutationEvent {
-    mutations: MutationRecord;
-    unit: object;
+    mutation: simpleMutation;
+    unit: instrumentationAttributionUnitEvent;
+}
+
+export interface simpleMutation {
+    type: MutationRecordType;
+    oldValue: string | null;
+    newValue: string | null;
+    attributeName: string | null;
+    removedNodes: string[] | null;
+    addedNodes: string[] | null;
+    date: number;
+    id: number;
 }
 
 export class Observer {
@@ -13,6 +26,7 @@ export class Observer {
     private readonly _backgroundPort = chrome.runtime.connect({
         name: "content"
     });
+    private _mutationId = 0;
 
     constructor() {
         this._mutationObserver = this.createObserver();
@@ -78,7 +92,7 @@ export class Observer {
                 if(unit) {
                     let history = this._nodeHistory.get(mutation.target);
                     history = history ?? [];
-                    history.push({mutations: mutation, unit: structuredClone(unit)});
+                    history.push({mutation: this.simplifyMutation(mutation), unit: structuredClone(unit) as instrumentationAttributionUnitEvent});
                     this._nodeHistory.set(mutation.target, history);
                 }
             }
@@ -117,5 +131,32 @@ export class Observer {
             this._currentUnit = structuredClone(event.detail as object);
         }
         else this._currentUnit = undefined;
+    }
+
+    /**
+     * Simplify a mutation record to serializable object
+     * @param mutation
+     * @private
+     */
+    private simplifyMutation(mutation: MutationRecord): simpleMutation {
+
+        let newValue = null;
+        if(mutation.type === "attributes" && mutation.target instanceof Element) {
+            newValue = mutation.target.getAttribute(mutation.attributeName ?? "");
+        }
+        if(mutation.type === "characterData" && mutation.target instanceof Element) {
+            newValue = mutation.target.textContent;
+        }
+
+        return {
+            date: Date.now(),
+            type: mutation.type,
+            oldValue: mutation.oldValue,
+            newValue,
+            attributeName: mutation.attributeName,
+            removedNodes: Array.from(mutation.removedNodes).map(node => node.nodeName),
+            addedNodes: Array.from(mutation.addedNodes).map(node => node.nodeName),
+            id: this._mutationId++
+        }
     }
 }

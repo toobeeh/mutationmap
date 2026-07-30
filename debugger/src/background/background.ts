@@ -1,13 +1,11 @@
 import Port = chrome.runtime.Port;
 
-console.log("Background script running...");
+console.log("MutationMap ~ Background");
 
 const devtoolsPorts = new Map<number, Port>();
 
 /* forward messages from content script to debugger */
 chrome.runtime.onConnect.addListener((port) => {
-
-    console.log(port.name);
 
     /* handle devtools connections */
     if (port.name === "devtools") {
@@ -35,8 +33,6 @@ chrome.runtime.onConnect.addListener((port) => {
     if (port.name === "content") {
 
         port.onMessage.addListener((msg) => {
-
-            console.log(msg);
 
             const tabId = port.sender?.tab?.id;
             const devtoolsPort = devtoolsPorts.get(tabId ?? -1);

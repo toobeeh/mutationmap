@@ -16,6 +16,7 @@
     "vite-plugin-zip-pack": "^1.2.4"
   },
   "dependencies": {
+    "mutationmap-transpiler": "^1.0.0",
     "@webcomponents/custom-elements": "^1.6.0"
   }
 }
