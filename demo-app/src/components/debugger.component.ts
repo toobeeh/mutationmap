@@ -25,6 +25,6 @@ export default class DebuggerComponent extends HTMLElement {
         });
         this.count = 0;
 
-        this.shadowRoot.append(this._button, this._span);
+        this.shadowRoot?.append(this._button, this._span);
     }
 }

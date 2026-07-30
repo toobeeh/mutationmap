@@ -62,18 +62,8 @@ export default class DebuggerComponent extends HTMLElement {
                 mutationmap-mutation {
                     display: contents;
                 }
-                
-                #title {
-                    font-family: system-ui;
-                    padding: .3rem;
-                    border-bottom: 1px solid grey;
-                    position: sticky;
-                    top: 0;
-                    background: #434465;
-                    z-index: 10;
-                }
             </style>
-            <div id="title">Mutations caused by attribution units in instrumented code</div>
+            
             <div id="log"></div>
         `;
     }

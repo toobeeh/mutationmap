@@ -68,17 +68,6 @@ export default class MutationComponent extends HTMLElement {
                     user-select: none;
                 }
                 
-                .header {
-                    grid-column: 1 / -1;
-                    margin-bottom: .2rem;
-                }
-                
-                .name {
-                    color: #4b9fbb;
-                    font-style: italic;
-                    padding-left: .5rem;
-                }
-                
                 .properties {
                     display: grid;
                     grid-template-columns: auto 1fr;
@@ -86,12 +75,23 @@ export default class MutationComponent extends HTMLElement {
                     margin-top: .5rem;
                     margin-bottom: .5rem;
                 }
+                
+                .properties .header {
+                    grid-column: 1 / -1;
+                    margin-bottom: .2rem;
+                    opacity: .7;
+                }
+                
+                .properties .name {
+                    color: #7cacf8;
+                    padding-left: .5rem;
+                }
             </style>
 
             <div id="mutation">
                 <small>${new Date(mutation.date).toLocaleTimeString()}</small>
                 <details ${this._defaultOpen ? "open" : ""}>
-                    <summary><span id="name">${unit.name}</span> 🠆 <span id="type">${mutation.type}</span></summary>
+                    <summary><span id="name">${unit.name}</span> @ <span id="type">${mutation.type}</span></summary>
                     
                     <div class="properties">
                         <span class="header">Attribution Unit</span>
@@ -103,6 +103,8 @@ export default class MutationComponent extends HTMLElement {
                     
                     <div class="properties">
                         <span class="header">DOM Mutation</span>
+                        
+                        <span class="name">Target</span> <span>${mutation.target}</span>
                         <span class="name">Type</span> <span>${mutation.type}</span>
                         
                         ${

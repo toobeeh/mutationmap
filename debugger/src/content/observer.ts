@@ -7,6 +7,7 @@ export interface mutationEvent {
 
 export interface simpleMutation {
     type: MutationRecordType;
+    target: string;
     oldValue: string | null;
     newValue: string | null;
     attributeName: string | null;
@@ -18,7 +19,7 @@ export interface simpleMutation {
 
 export class Observer {
 
-    private _nodeHistory: WeakMap<Node, mutationEvent[]> = new WeakMap();
+    private _nodeHistory: Map<Node, mutationEvent[]> = new Map();
     private readonly _mutationObserver: MutationObserver;
     private _currentUnit?: object;
     private _mutationObservers: MutationObserver[] = [];
@@ -39,7 +40,7 @@ export class Observer {
     public observe() {
 
         /* disconnect from previous tasks */
-        this._nodeHistory = new WeakMap();
+        this._nodeHistory = new Map();
         this._mutationObservers.forEach(observer => observer.disconnect());
         this._mutationObservers = [];
         document.removeEventListener("attributionUnitEntered", this._unitEventhandler);
@@ -57,9 +58,33 @@ export class Observer {
     /**
      * Get the history of mutations for a specific node.
      * @param node
+     * @param descendants
+     */
+    public getHistoryForNodeDescendants(node: Node): mutationEvent[] | undefined {
+
+        /* get all histories of nodes that are descendants */
+        const keys = [...this._nodeHistory.keys()];
+        const history: mutationEvent[] = [];
+        for(const key of keys) {
+            if(this.nodeContains(node, key)) {
+                const nodeHistory = this._nodeHistory.get(key);
+                if(nodeHistory) history.push(...nodeHistory);
+            }
+        }
+
+        /* order by id ascending */
+        return history.sort((a,b) => a.mutation.id - b.mutation.id);
+    }
+
+    /**
+     * Get the history of mutations for a specific node.
+     * @param node
+     * @param descendants
      */
     public getHistoryForNode(node: Node): mutationEvent[] | undefined {
-        return this._nodeHistory.get(node);
+
+        /* order by id ascending */
+        return this._nodeHistory.get(node)?.sort((a,b) => a.mutation.id - b.mutation.id);
     }
 
     /**
@@ -92,7 +117,10 @@ export class Observer {
                 if(unit) {
                     let history = this._nodeHistory.get(mutation.target);
                     history = history ?? [];
-                    history.push({mutation: this.simplifyMutation(mutation), unit: structuredClone(unit) as instrumentationAttributionUnitEvent});
+                    history.push({
+                        mutation: this.simplifyMutation(mutation),
+                        unit: structuredClone(unit) as instrumentationAttributionUnitEvent
+                    });
                     this._nodeHistory.set(mutation.target, history);
                 }
             }
@@ -150,6 +178,7 @@ export class Observer {
 
         return {
             date: Date.now(),
+            target: mutation.target.nodeName,
             type: mutation.type,
             oldValue: mutation.oldValue,
             newValue,
@@ -158,5 +187,33 @@ export class Observer {
             addedNodes: Array.from(mutation.addedNodes).map(node => node.nodeName),
             id: this._mutationId++
         }
+    }
+
+    /**
+     * Check if a node contains another node, taking into account shadow doms
+     * @param root
+     * @param otherNode
+     * @private
+     */
+    private nodeContains(root: Node, otherNode: Node): boolean {
+        if (!root || !otherNode) {
+            return false
+        }
+
+        let node: Node | null = otherNode;
+        while (node) {
+            if (node === root) {
+                return true;
+            }
+
+            if(node instanceof ShadowRoot) {
+                node = node.host;
+            }
+            else {
+                node = node.parentNode;
+            }
+        }
+
+        return false;
     }
 }

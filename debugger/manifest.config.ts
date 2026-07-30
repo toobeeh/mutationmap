@@ -18,7 +18,7 @@ export default defineManifest({
         type: "module",
     },
     content_scripts: [{
-        js: ['src/content/main.ts'],
+        js: ['src/content/content.ts'],
         matches: ["<all_urls>"]
     }],
     devtools_page: "src/devtools/index.html",

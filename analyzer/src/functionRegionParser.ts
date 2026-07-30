@@ -51,7 +51,7 @@ export class FunctionRegionParser implements regionParser<FunctionNode> {
 
         /* iterate over files and all of their nodes */
         for (const file of files) {
-            file.forEachDescendant(node => {
+            file.forEachDescendant((node) => {
 
                 /* detect function-like nodes */
                 if (functionNodeKinds.some(kind => node instanceof kind)) {

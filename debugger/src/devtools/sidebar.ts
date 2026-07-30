@@ -1,6 +1,8 @@
 import {mutationEvent} from "@/content/observer.ts";
 import DebuggerComponent from "@/components/debugger.component.ts";
 import MutationComponent from "@/components/mutation.component.ts";
+import SettingsComponent from "@/components/settings.component.ts";
+import TitleComponent from "@/components/title.component.ts";
 
 console.log("MutationMap ~ Devtools");
 
@@ -15,11 +17,13 @@ port.postMessage({
 });
 
 /* define custom UI components */
+customElements.define("mutationmap-title", TitleComponent);
 customElements.define("mutationmap-debugger", DebuggerComponent);
 customElements.define("mutationmap-mutation", MutationComponent);
+customElements.define("mutationmap-settings", SettingsComponent);
 
-const debuggerComponent = new DebuggerComponent();
-document.body.appendChild(debuggerComponent);
+const debuggerComponent = document.querySelector<DebuggerComponent>("mutationmap-debugger")!;
+const settingsComponent = document.querySelector<SettingsComponent>("mutationmap-settings")!;
 
 /* set sidebar to currently selected element */
 updateSidebar();
@@ -36,13 +40,23 @@ port.onMessage.addListener((message) => {
     }
 });
 
+/* listen to settings changes */
+settingsComponent.addEventListener("change", updateSidebar);
+
 /**
  * Update the sidebar with the current unit log for the selected element.
  */
 function updateSidebar() {
 
+    const viewDescendants = settingsComponent.viewDescendants;
+    /*const onlyLatest = settingsComponent.onlyLatest;*/
+
+    const expression = viewDescendants ?
+        `document.getDescendantUnitLog($0)`:
+        `document.getUnitLog($0)`;
+
     /* need to use eval to pass node reference */
-    chrome.devtools.inspectedWindow.eval("document.getUnitLog($0)", {
+    chrome.devtools.inspectedWindow.eval(expression, {
         useContentScriptContext: true
     }, (result) => {
         if(Array.isArray(result)) {
