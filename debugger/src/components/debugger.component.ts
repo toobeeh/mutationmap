@@ -8,36 +8,57 @@ export default class DebuggerComponent extends HTMLElement {
         this.attachShadow({mode:'open'});
     }
 
+    /**
+     *
+     * @param log most recent last
+     */
     public set log(log: mutationEvent[]) {
         const logComponent = this.shadowRoot?.querySelector("#log") ?? undefined;
         if(logComponent) {
-            const logItems = logComponent.querySelectorAll<MutationComponent>("mutationmap-mutation");
-            const lastId = Math.max(...[...logItems].map(item => item.mutationId));
-
-            /* only select newer mutations, ordered ascending */
-            const newer = log
-                .filter(event => event.mutation.id > lastId)
-                .sort((a,b) => a.mutation.id - b.mutation.id);
-            const maxId = Math.max(...newer.map(event => event.mutation.id));
-
-            /* if user has not interacted, close all items and open the latest */
-            const userInteracted = [...logItems].some(item => item.userOpened);
-            if(!userInteracted) {
-                logItems.forEach(item => item.close());
-            }
-
-            /* append new elements */
-            newer.forEach(mutation => {
-                const mutationComponent = new MutationComponent(mutation, !userInteracted && mutation.mutation.id === maxId);
-                logComponent.insertAdjacentElement("afterbegin", mutationComponent);
-            });
+            const existingEvents = [...logComponent.querySelectorAll<MutationComponent>("mutationmap-mutation")];
+            const userInteracted = existingEvents.some(item => item.userOpened);
 
             /* remove items that are no longer present */
-            logItems.forEach(item => {
+            const presentEvents: MutationComponent[] = [];
+            existingEvents.forEach(item => {
                 if(!log.some(event => event.mutation.id === item.mutationId)) {
                     item.remove();
                 }
+                else presentEvents.push(item);
             });
+            const lastExistingId = Math.max(...presentEvents.map(item => item.mutationId));
+
+            /* only select newer or missing mutations, ordered from new to old */
+            const newEvents = log
+                .filter(event => event.mutation.id > lastExistingId || !existingEvents.some(item => item.mutationId === event.mutation.id))
+                .sort((a, b) => b.mutation.id - a.mutation.id);
+            const lastNewId = Math.max(lastExistingId, ...newEvents.map(event => event.mutation.id));
+
+            /* append new elements in correct order */
+            newEvents.forEach(mutation => {
+                const mutationComponent = new MutationComponent(mutation, !userInteracted && mutation.mutation.id === lastNewId);
+
+                /* find first existing that is older */
+                const insertPosition = presentEvents.find(item => item.mutationId < mutation.mutation.id);
+
+                /* if none older, add at end */
+                if(insertPosition === undefined) {
+                    logComponent.insertAdjacentElement("beforeend", mutationComponent);
+                }
+                /* else add before older */
+                else {
+                    insertPosition.insertAdjacentElement("beforebegin", mutationComponent);
+                }
+            });
+
+            /* if user has not interacted, close all items and open the latest */
+            if(!userInteracted) {
+                presentEvents.forEach(item => {
+                    if(item.mutationId !== lastNewId) {
+                        item.close();
+                    }
+                });
+            }
         }
     }
 

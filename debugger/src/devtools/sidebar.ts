@@ -49,7 +49,7 @@ settingsComponent.addEventListener("change", updateSidebar);
 function updateSidebar() {
 
     const viewDescendants = settingsComponent.viewDescendants;
-    /*const onlyLatest = settingsComponent.onlyLatest;*/
+    const onlyLatest = settingsComponent.onlyLatest;
 
     const expression = viewDescendants ?
         `document.getDescendantUnitLog($0)`:
@@ -60,7 +60,14 @@ function updateSidebar() {
         useContentScriptContext: true
     }, (result) => {
         if(Array.isArray(result)) {
-            debuggerComponent.log = result as unknown as mutationEvent[];
+            const events = result as unknown as mutationEvent[];
+
+            if(onlyLatest) {
+                debuggerComponent.log = events.slice(-1);
+            }
+            else {
+                debuggerComponent.log = events;
+            }
         }
         else if (result === undefined) {
             debuggerComponent.log = [];
