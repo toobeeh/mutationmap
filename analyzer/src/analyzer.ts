@@ -3,70 +3,27 @@ import type {analyzerConfig} from "./types/analyzer-config.interface.js";
 import type {regionParser} from "./types/region-parser.interface.js";
 import type {propertyParser} from "./types/property-parser.interface.js";
 import {FunctionRegionParser} from "./functionRegionParser.js";
-import {CorePropertyParser} from "./corePropertyParser.js";
+import {FunctionPropertyParser} from "./functionPropertyParser.js";
 import {Project, Node} from "ts-morph";
 
 /**
- * Analyzes a file for attribution units using the provided region and property parsers.
+ * Main function for performing attribution unit analysis,
+ * on a given codebase using given region parser to parse regions in the codebase,
+ * and a given property parser to extract attribution units from the region.
  * @param config configuration for the analyzer
- * @param path path to the file to analyze
- * @param regionParser parser for a specific region type, used as a basis for parsed attribution units
+ * @param codebase the codebase to analyze, which can be a path, a parsed AST, or any other representation
+ * @param regionParser codebase-compatible region parser for a specific region type, used as a basis for parsed attribution units
  * @param propertyParser parser for the properties of the attribution unit
  */
-export async function analyzeAttributionUnitsInFile<TUnit extends attributionUnit, TRegion extends Node>(
+async function analyzeAttributionUnits<TCodebase, TUnit extends attributionUnit, TRegion extends Node>(
     config: analyzerConfig,
-    path: string,
-    regionParser: regionParser<TRegion>,
-    propertyParser: propertyParser<TUnit, TRegion>
-): Promise<TUnit[]> {
-
-    /* init AST parsing context */
-    const project = new Project({
-        compilerOptions: {
-            allowJs: true
-        }
-    });
-    project.addSourceFileAtPath(path);
-
-    return analyzeAttributionUnitsInProject<TUnit, TRegion>(config, project, regionParser, propertyParser);
-}
-
-/**
- * Analyzes a plain text for attribution units using the provided region and property parsers.
- * @param config configuration for the analyzer
- * @param aliasPath an alias path to use for the text, used for AST parsing context
- * @param text the text to analyze, being the content of a ts or js source file
- * @param regionParser parser for a specific region type, used as a basis for parsed attribution units
- * @param propertyParser parser for the properties of the attribution unit
- */
-export async function analyzeAttributionUnitsInText<TUnit extends attributionUnit, TRegion extends Node>(
-    config: analyzerConfig,
-    aliasPath: string,
-    text: string,
-    regionParser: regionParser<TRegion>,
-    propertyParser: propertyParser<TUnit, TRegion>
-): Promise<TUnit[]> {
-
-    /* init AST parsing context */
-    const project = new Project({
-        compilerOptions: {
-            allowJs: true
-        }
-    });
-    project.createSourceFile(aliasPath, text, {overwrite: true});
-
-    return analyzeAttributionUnitsInProject<TUnit, TRegion>(config, project, regionParser, propertyParser);
-}
-
-async function analyzeAttributionUnitsInProject<TUnit extends attributionUnit, TRegion extends Node>(
-    config: analyzerConfig,
-    project: Project,
-    regionParser: regionParser<TRegion>,
+    codebase: TCodebase,
+    regionParser: regionParser<TCodebase, TRegion>,
     propertyParser: propertyParser<TUnit, TRegion>
 ): Promise<TUnit[]> {
 
     /* parse unit regions */
-    const regions = regionParser.parseRegions(project);
+    const regions = regionParser.parseRegions(codebase);
 
     /* parse properties of units */
     const units: TUnit[] = [];
@@ -80,37 +37,39 @@ async function analyzeAttributionUnitsInProject<TUnit extends attributionUnit, T
 
 /**
  * Abstract attribution unit analyzer to perform mutation attribution analysis,
- * for tasks where consecutive files are being analyzed
+ * for tasks where consecutive files are being analyzed and state
+ * or instances should be preserved across iterations
  */
-export abstract class AttributionUnitAnalyzer<TUnit extends attributionUnit, TRegion extends Node> {
+export abstract class AttributionUnitAnalyzer<TCodebase, TUnit extends attributionUnit, TRegion extends Node> {
 
-    protected abstract readonly _regionParser: regionParser<TRegion>;
+    protected abstract readonly _regionParser: regionParser<TCodebase, TRegion>;
     protected abstract readonly _propertyParser: propertyParser<TUnit, TRegion>;
 
     protected constructor(protected readonly _config: analyzerConfig) { }
 
-    async analyzeFile(path: string): Promise<TUnit[]> {
-        return analyzeAttributionUnitsInFile<TUnit, TRegion>(this._config, path, this._regionParser, this._propertyParser);
-    }
-
-    async analyzeText(aliasPath: string, text: string): Promise<TUnit[]> {
-        return analyzeAttributionUnitsInText<TUnit, TRegion>(this._config, aliasPath, text, this._regionParser, this._propertyParser);
+    /**
+     * Analyzes a codebase for attribution units using the provided region and property parsers.
+     * @param codebase the codebase to analyze, depending on implementation
+     */
+    async analyzeCodebase(codebase: TCodebase): Promise<TUnit[]> {
+        return analyzeAttributionUnits<TCodebase, TUnit, TRegion>(this._config, codebase, this._regionParser, this._propertyParser);
     }
 }
 
 /**
  * Default mutation attribution analyzer as per specification,
- * which parses function-like regions and their properties to attribution units
+ * which parses function-like regions and their properties to attribution units.
+ * Uses AST-based analysis with ts-morph, which "Project" type is the codebase representation.
  */
-export class FunctionUnitAnalyzer extends AttributionUnitAnalyzer<attributionUnit, Node> {
+export class FunctionUnitAnalyzer extends AttributionUnitAnalyzer<Project, attributionUnit, Node> {
 
-    protected override readonly _regionParser: regionParser<Node>;
+    protected override readonly _regionParser: regionParser<Project, Node>;
     protected override readonly _propertyParser: propertyParser<attributionUnit, Node>;
 
     constructor(protected override readonly _config: analyzerConfig) {
         super(_config);
         this._regionParser = new FunctionRegionParser();
-        this._propertyParser = new CorePropertyParser(_config.repoSourcePath);
+        this._propertyParser = new FunctionPropertyParser(_config.repoSourcePath);
     }
 }
 

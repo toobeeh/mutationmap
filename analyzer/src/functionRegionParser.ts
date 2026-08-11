@@ -11,10 +11,12 @@ import {
 /**
  * Node types that are considered function-like
  *
- * Easy cases: function/method/constructor declarations
+ * Easy cases: function/method/constructor/getset declarations
  * function abc(){ }
  * private abc() { }
  * constructor() { }
+ * get abc() { }
+ * set abc() { }
  *
  * Everything else are expressions or arrow functions and have no declared name:
  * function expressions might have a name, arrow functions have no declared name
@@ -41,7 +43,7 @@ export const functionNodeKinds = [
  * A region parser to detect function-like regions,
  * which are the default mutation unit regions as per specification
  */
-export class FunctionRegionParser implements regionParser<FunctionNode> {
+export class FunctionRegionParser implements regionParser<Project, FunctionNode> {
 
     parseRegions(project: Project): FunctionNode[] {
 

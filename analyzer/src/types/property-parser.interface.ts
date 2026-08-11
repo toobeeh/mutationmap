@@ -3,12 +3,11 @@ import type {attributionUnit} from "./attribution-unit.interface.js";
 import type {analyzerConfig} from "./analyzer-config.interface.js";
 
 /**
- * Parse an attribution unit from a given region
+ * Parses an attribution unit with properties from a given region.
  *
- * @param path The path of the file being analyzed
- * @param unit The region as AST node
- * @returns The parsed attribution unit
+ * TUnit: The type of the attribution unit to parse, containing the defined set of properties
+ * TRegion: The type of the region where metadata is parsed from (e.g., AST node, file, etc.)
  */
-export interface propertyParser<TUnit extends attributionUnit, TRegion extends Node> {
+export interface propertyParser<TUnit extends attributionUnit, TRegion> {
     parseProperties(config: analyzerConfig, region: TRegion): Promise<TUnit>;
 }

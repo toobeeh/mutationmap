@@ -24,9 +24,9 @@ export interface functionLikeIdentifier {
 }
 
 /**
- * A property parser fore core attribution unit properties as per specification
+ * A property parser fore core attribution unit properties of aa function as per specification
  */
-export class CorePropertyParser implements propertyParser<attributionUnit, FunctionNode> {
+export class FunctionPropertyParser implements propertyParser<attributionUnit, FunctionNode> {
 
     private readonly repository?: SimpleGit;
 
