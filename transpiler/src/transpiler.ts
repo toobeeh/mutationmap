@@ -53,7 +53,10 @@ export class InstrumentationTranspiler {
 
         /* import virtual module at top */
         const sourceFile = units[0]!.node.getSourceFile();
-        sourceFile.insertStatements(0, `import * as mutationmap from "virtual:instrumentation-handler";`);
+        sourceFile.insertStatements(0, `
+            import * as mutationmap from "virtual:instrumentation-handler";
+            mutationmap.register("${fileHash}", ${JSON.stringify(units.map(unit => this.simplifyUnit(unit)))});
+        `);
 
         return sourceFile.getText();
     }

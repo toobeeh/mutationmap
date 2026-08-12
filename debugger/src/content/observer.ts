@@ -47,11 +47,6 @@ export class Observer {
 
         /* start observing on root; root observer starts shadow dom observers */
         this.observeElement(document.body, this._mutationObserver);
-        document.body.querySelectorAll("*").forEach((element) => {
-            if (element.shadowRoot !== null) {
-                this.observeElement(element.shadowRoot, this.createObserver());
-            }
-        });
         document.addEventListener("attributionUnitEntered", this._unitEventhandler);
     }
 
@@ -139,13 +134,18 @@ export class Observer {
      * @private
      */
     private observeElement(element: HTMLElement | ShadowRoot, observer: MutationObserver) {
-       observer.observe(element, {
+        observer.observe(element, {
             childList: true,
             subtree: true,
             attributes: true,
             characterData: true
         });
-       this._mutationObservers.push(observer);
+        this._mutationObservers.push(observer);
+        element.querySelectorAll("*").forEach((element) => {
+            if (element.shadowRoot !== null) {
+                this.observeElement(element.shadowRoot, this.createObserver());
+            }
+        });
     }
 
     /**

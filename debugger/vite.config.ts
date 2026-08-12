@@ -7,9 +7,10 @@ import { name, version } from './package.json';
 
 export default defineConfig({
     build: {
+        sourcemap: true,
         rolldownOptions: {
             input: {
-                welcome: 'src/devtools/sidebar.html',
+                sidebar: 'src/devtools/sidebar.html',
             },
         },
     },
