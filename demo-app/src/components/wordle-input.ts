@@ -15,7 +15,7 @@ export class WordleInput extends LitElement {
   game?: Wordle;
 
   @property({ attribute: false })
-  remainingAttempts: 0;
+  remainingAttempts = 0;
 
   connectedCallback() {
     super.connectedCallback();
@@ -23,18 +23,24 @@ export class WordleInput extends LitElement {
   }
 
   render() {
+
+    const rowChars = " ".repeat(this.game?.wordLength ?? 0).split("");
+    const remainingAttempts = " ".repeat(this.remainingAttempts - 1).split("");
+
     return html`
       <div class="attempt">
         ${
-          this.remainingAttempts !== 0 ? " ".repeat(this.game?.wordLength).split("").map((_, index) => html`
-              <wordle-log .state="${(this.game?.finished === true) ? "idle" : (this._input[index] ? 'correct' : 'present')}">${this._input[index] ?? " "}</wordle-log>
+          this.remainingAttempts !== 0 ? rowChars.map((_, index) => html`
+              <wordle-log .state="${(this.game?.finished === true) ? "idle" : (this._input[index] ? 'correct' : 'present')}">
+                ${this._input[index] ?? " "}
+              </wordle-log>
           `) : ""
         }
       </div>
       ${
-        " ".repeat(this.remainingAttempts - 1).split("").map(() => html`
+        remainingAttempts.map(() => html`
           <div class="attempt">${
-            " ".repeat(this.game?.wordLength).split("").map(() => html`
+            rowChars.map(() => html`
               <wordle-log .state=${"idle"}> </wordle-log>
           `)
         }`)
@@ -66,7 +72,7 @@ export class WordleInput extends LitElement {
         this.dispatchEvent(new CustomEvent('wordSubmitted'));
       } catch (error) {
         console.error(error);
-        alert(error.message);
+        alert((error as any).message);
         this._input = "";
       }
     }

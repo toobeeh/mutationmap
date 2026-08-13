@@ -38,7 +38,7 @@ export class WordleGame extends LitElement {
             this._game?.guesses.map(guess => html`
               <div class="guess">
                 ${guess.split('').map((char, index) => html`
-                    <wordle-log .state=${this._game.characterGuessStatus(char, index)}>${char}</wordle-log>
+                    <wordle-log .state=${this._game?.characterGuessStatus(char, index)}>${char}</wordle-log>
                 `)}
               </div>
             `)
@@ -55,7 +55,7 @@ export class WordleGame extends LitElement {
         <div class="characters">
           ${
             this._game?.characters.map(char => html`
-              <wordle-character .state=${this._game.characterStatus(char)}>${char}</wordle-character>
+              <wordle-character .state=${this._game?.characterStatus(char)}>${char}</wordle-character>
             `)
           }
         </div>
