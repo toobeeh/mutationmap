@@ -5,6 +5,7 @@
     "analyzer-cli",
     "transpiler",
     "demo-app",
-    "debugger"
+    "debugger",
+    "evaluation/lib"
   ]
 }
