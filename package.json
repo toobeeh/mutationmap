@@ -6,6 +6,7 @@
     "transpiler",
     "demo-app",
     "debugger",
-    "evaluation/lib"
+    "evaluation/lib",
+    "evaluation/vanilla"
   ]
 }

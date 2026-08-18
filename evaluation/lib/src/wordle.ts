@@ -71,6 +71,13 @@ export class Wordle {
     }
 
     /**
+     * Returns the word to guess
+     */
+    public get word() {
+        return this._word;
+    }
+
+    /**
      * Returns the set of available characters for guessing, sorted alphabetically
      */
     public get characters() {

@@ -1,0 +1,74 @@
+.controls {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.game {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.game .guesses {
+    display: grid;
+    grid-template-columns: repeat(5, 2rem);
+    grid-template-rows: repeat(5, 2rem);
+}
+
+.game .guesses .guess {
+    display: contents;
+}
+.game .guesses .guess.old {
+    opacity: .5;
+}
+
+.game .guesses .guess.old {
+    opacity: 1;
+}
+
+.game .guesses .guess.current {
+    opacity: 1;
+    color: green;
+}
+
+.game .guesses .character {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.game .guesses .character:empty::before {
+    content: "?";
+}
+
+.game .characters {
+    display: grid;
+    grid-template-columns: repeat(13, 1rem);
+    grid-template-rows: repeat(2, 1rem);
+}
+
+.game .characters .character {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:is(.game .guesses .character, .game .characters .character).correct {
+    color: green;
+}
+
+:is(.game .guesses .character, .game .characters .character).absent {
+    color: red;
+}
+
+:is(.game .guesses .character, .game .characters .character).idle {
+
+}
+
+:is(.game .guesses .character, .game .characters .character).present {
+    color: blue;
+}
+
