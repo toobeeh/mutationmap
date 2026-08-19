@@ -1,4 +1,4 @@
-import type {Plugin} from "vite";
+import type {Plugin, PluginOption} from "vite";
 import {InstrumentationUnitAnalyzer} from "./instrumentationUnitAnalyzer.js";
 import {InstrumentationTranspiler} from "./transpiler.js";
 import * as path from "path";
@@ -7,7 +7,7 @@ import * as path from "path";
  * Vite plugin to parse attribution units from source code and
  * instrument the units with execution events & last-executed unit indicator.
  */
-export function instrumentMutationAttribution(repoSourcePath: string | undefined): Plugin {
+export function instrumentMutationAttribution(repoSourcePath: string | undefined): PluginOption {
 
     const virtualModuleId = "virtual:instrumentation-handler";
     const resolvedVirtualModuleId = "\0" + virtualModuleId;

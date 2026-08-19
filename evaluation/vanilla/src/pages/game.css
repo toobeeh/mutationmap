@@ -2,34 +2,28 @@
     display: flex;
     flex-direction: row;
     gap: 1rem;
+    padding-bottom: 1rem;
 }
 
 .game {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
+    align-items: center;
 }
 
 .game .guesses {
     display: grid;
     grid-template-columns: repeat(5, 2rem);
     grid-template-rows: repeat(5, 2rem);
+    border: 1px solid black;
+    border-radius: .2rem;
+    padding: .2rem;
+    gap: .2rem;
 }
 
 .game .guesses .guess {
     display: contents;
-}
-.game .guesses .guess.old {
-    opacity: .5;
-}
-
-.game .guesses .guess.old {
-    opacity: 1;
-}
-
-.game .guesses .guess.current {
-    opacity: 1;
-    color: green;
 }
 
 .game .guesses .character {
@@ -37,16 +31,27 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #ededed;
+    border-radius: .2rem;
+}
+
+.game .guesses .guess.old .character {
+    background: #c8d4eb;
+}
+
+.game .guesses .guess.current .character {
+    background: #d2ebc8;
 }
 
 .game .guesses .character:empty::before {
-    content: "?";
+    content: " ";
 }
 
 .game .characters {
     display: grid;
-    grid-template-columns: repeat(13, 1rem);
-    grid-template-rows: repeat(2, 1rem);
+    gap: .2rem;
+    grid-template-columns: repeat(13, 1.5rem);
+    grid-template-rows: repeat(2, 1.5rem);
 }
 
 .game .characters .character {
@@ -54,21 +59,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: .2rem;
 }
 
 :is(.game .guesses .character, .game .characters .character).correct {
-    color: green;
+    background: #d6ebc8;
 }
 
 :is(.game .guesses .character, .game .characters .character).absent {
-    color: red;
+    background: #ebc8c8;
 }
 
-:is(.game .guesses .character, .game .characters .character).idle {
-
+:is(.game .guesses .character, .game .characters .character) {
+    background: #ededed;
 }
 
 :is(.game .guesses .character, .game .characters .character).present {
-    color: blue;
+    background: #ededed;
 }
 
