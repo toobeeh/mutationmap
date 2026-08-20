@@ -12,6 +12,8 @@ export interface instrumentationAttributionUnitEvent {
 
 export class InstrumentationTranspiler {
 
+    constructor(readonly handlerModuleId: string) {}
+
     private parsedUnits: Map<string, instrumentationAttributionUnit[]> = new Map();
 
     /**
@@ -54,7 +56,7 @@ export class InstrumentationTranspiler {
         /* import virtual module at top */
         const sourceFile = units[0]!.node.getSourceFile();
         sourceFile.insertStatements(0, `
-            import * as mutationmap from "virtual:instrumentation-handler";
+            import * as mutationmap from "${this.handlerModuleId}";
             mutationmap.register("${fileHash}", ${JSON.stringify(units.map(unit => this.simplifyUnit(unit)))});
         `);
 

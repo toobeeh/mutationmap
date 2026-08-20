@@ -75,6 +75,6 @@
 }
 
 :is(.game .guesses .character, .game .characters .character).present {
-    background: #ededed;
+    background: #b9caff;
 }
 

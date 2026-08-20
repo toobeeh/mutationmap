@@ -11,8 +11,13 @@ export class InstrumentationPropertyParser extends CorePropertyParser {
         const identifier = this.getIdentificationFromFunctionLikeRegion(region);
         const location = this.getLocationFromFunctionNode(region);
         const name = this.getNameFromIdentifier(identifier);
-        const gitBlame = await this.getGitBlameForRegion(region);
-        const author = (gitBlame !== undefined ? this.getAuthorFromGitBlame(gitBlame) : undefined) ?? "Unknown";
+
+        let author = "Unknown";
+        try {
+            const gitBlame = await this.getGitBlameForRegion(region);
+            author = (gitBlame !== undefined ? this.getAuthorFromGitBlame(gitBlame) : undefined) ?? "Unknown";
+        }
+        catch (error) { }
 
         /* extra properties */
         const functionKind = region.getKindName();
