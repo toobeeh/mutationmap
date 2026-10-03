@@ -8,6 +8,7 @@
     "debugger",
     "evaluation/lib",
     "evaluation/vanilla",
-    "evaluation/svelte"
+    "evaluation/svelte",
+    "evaluation/angular"
   ]
 }

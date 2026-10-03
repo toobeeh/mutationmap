@@ -1,0 +1,24 @@
+<section>
+  <div class="controls">
+    <span>Round: <span id="round">{{ currentRound() }}</span></span>
+    <span>Streak: <span id="win-streak">{{ currentStreak() }}</span></span>
+    <button (click)="startGame()" id="new-game">New Game</button>
+  </div>
+
+  <div class="game">
+    <div class="guesses">
+
+      @for (item of [].constructor(5); track $index) {
+        <app-guess [guesses]="guesses" [currentGuess]="currentGuess" [index]="$index" />
+      }
+
+    </div>
+
+    <div class="characters">
+
+      @for (char of characters(); track char) {
+        <app-character [character]="char" [guesses]="guesses()" />
+      }
+    </div>
+  </div>
+</section>

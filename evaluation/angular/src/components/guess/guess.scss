@@ -1,0 +1,36 @@
+.guess, :host {
+  display: contents;
+}
+
+.guess .character {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ededed;
+  border-radius: .2rem;
+}
+
+.guess .character.old {
+  background: #c8d4eb;
+}
+
+.guess .character.current {
+  background: #d2ebc8;
+}
+
+.guess .character.correct {
+  background: #d6ebc8;
+}
+
+.guess .character.absent {
+  background: #ebc8c8;
+}
+
+.guess .character.present {
+  background: #b9caff;
+}
+
+.guess .character:empty::before {
+  content: " ";
+}

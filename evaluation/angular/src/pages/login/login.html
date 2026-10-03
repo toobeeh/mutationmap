@@ -1,0 +1,5 @@
+<section>
+  <label for="username">Username</label>
+  <input #username name="username" type="text" value="{{session.current().username}}">
+  <button id="submit" (click)="createSession(username.value)">Play</button>
+</section>

@@ -1,0 +1,16 @@
+<section>
+  @if (leaderboard.length === 0) {
+    <p>Be the frst in the leaderboard!</p>
+  } @else {
+    <div class="leaderboard">
+      @for (entry of leaderboard; track entry[0]) {
+        <div class="rank">
+          <span class="place">#{{ $index + 1 }}</span>
+          <span class="username">{{ entry[0] }}</span>
+          <span class="streak">Streak: {{ entry[1].winStreak }}</span>
+          <span class="average">Avg. Guesses: {{ entry[1].averageGuesses.toFixed(2) }}</span>
+        </div>
+      }
+    </div>
+  }
+</section>
