@@ -8,6 +8,7 @@
     "demo-app",
     "debugger",
     "evaluation/lib",
+    "evaluation/web-components",
     "evaluation/vanilla",
     "evaluation/svelte",
     "evaluation/angular"
