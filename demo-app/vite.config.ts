@@ -1,8 +1,0 @@
-import { instrumentMutationAttribution } from "mutationmap-transpiler";
-import {defineConfig, type PluginOption} from "vite";
-
-export default defineConfig({
-  plugins: [
-    instrumentMutationAttribution("../../")
-  ] as PluginOption[]
-});
