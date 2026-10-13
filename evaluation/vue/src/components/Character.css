@@ -1,0 +1,20 @@
+.list-character {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: .2rem;
+    background: #ededed;
+}
+
+.list-character.correct {
+    background: #d6ebc8;
+}
+
+.list-character.absent {
+    background: #ebc8c8;
+}
+
+.list-character.present {
+    background: #b9caff;
+}

@@ -11,6 +11,7 @@
     "evaluation/web-components",
     "evaluation/vanilla",
     "evaluation/svelte",
-    "evaluation/angular"
+    "evaluation/angular",
+    "evaluation/vue"
   ]
 }
