@@ -1,0 +1,33 @@
+.leaderboard {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    align-items: center;
+    justify-content: center;
+    row-gap: 1rem;
+    column-gap: 1rem;
+}
+
+.leaderboard .rank {
+    display: contents;
+}
+
+.leaderboard .rank .place {
+    font-size: 1.2em;
+    opacity: .9;
+}
+
+.leaderboard .rank .username {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+
+.leaderboard .rank .username:before {
+    content: "👤";
+    padding-right: .5rem;
+}
+
+.leaderboard .rank :is(.streak, .average) {
+    opacity: .9;
+    font-style: italic;
+}

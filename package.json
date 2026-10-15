@@ -12,6 +12,7 @@
     "evaluation/vanilla",
     "evaluation/svelte",
     "evaluation/angular",
-    "evaluation/vue"
+    "evaluation/vue",
+    "evaluation/react"
   ]
 }

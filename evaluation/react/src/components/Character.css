@@ -1,0 +1,20 @@
+.game-character {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: .2rem;
+    background: #ededed;
+}
+
+.game-character.correct {
+    background: #d6ebc8;
+}
+
+.game-character.absent {
+    background: #ebc8c8;
+}
+
+.game-character.present {
+    background: #b9caff;
+}

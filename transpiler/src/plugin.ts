@@ -6,6 +6,7 @@ import {vanillaTransformerPlugin} from "./plugins/vanillaTransformer.js";
 import {virtualModuleLoaderPlugin} from "./plugins/virtualModuleLoader.js";
 import type {instrumentationPluginOptions} from "./pluginOptions.interface.js";
 import {svelteTransformerPlugin} from "./plugins/svelteTransformer.js";
+import {reactTransformerPlugin} from "./plugins/reactTransformer.js";
 
 /**
  * Vite plugin to parse attribution units from source code and
@@ -29,6 +30,7 @@ export function instrumentMutationAttribution(options: instrumentationPluginOpti
     return [
         virtualModuleLoaderPlugin(virtualModuleId, resolvedVirtualModuleId),
         vanillaTransformerPlugin(analyzer, transpiler, options),
-        svelteTransformerPlugin(analyzer, transpiler, options)
+        svelteTransformerPlugin(analyzer, transpiler, options),
+        reactTransformerPlugin(analyzer, transpiler, options)
     ]
 }
